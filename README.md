@@ -8,13 +8,19 @@ This is an example demonstrates how to implement a GraphQL server based on [pris
 docker-compose up -d
 ```
 
-2. Deploy service to prisma server and then generate the corresponding code of prisma client:
+2. Install Node dependencies:
+
+```sh
+yarn install
+```
+
+3. Deploy service to prisma server and then generate the corresponding code of prisma client:
 
 ```sh
 yarn dg
 ```
 
-3. Start the apollo server:
+4. Start the apollo server:
 
 ```sh
 yarn start
