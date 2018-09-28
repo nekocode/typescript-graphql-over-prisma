@@ -1,0 +1,31 @@
+{
+  "name": "typescript-graphql-auth",
+  "version": "1.0.0",
+  "main": "index.js",
+  "author": "nekocode",
+  "license": "Apache-2.0",
+  "scripts": {
+    "start": "ts-node src/index.ts",
+    "deploy-model": "cd prisma && prisma deploy",
+    "gen-code": "cd prisma && prisma generate",
+    "dg": "cd prisma && prisma deploy && prisma generate"
+  },
+  "dependencies": {
+    "jsonwebtoken": "^8.3.0",
+    "@types/jsonwebtoken": "^7.2.8",
+    "bcrypt": "^3.0.0",
+    "graphql": "^14.0.2",
+    "@types/graphql": "^14.0.1",
+    "apollo-server": "^2.1.0",
+    "prisma-client-lib": "^1.17.1"
+  },
+  "devDependencies": {
+    "@types/bcrypt": "^2.0.0",
+    "prisma": "^1.17.1",
+    "ts-node": "^7.0.1",
+    "typescript": "^3.0.3"
+  },
+  "resolutions": {
+    "prisma/**/graphql": "^14.0.2"
+  }
+}

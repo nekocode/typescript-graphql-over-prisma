@@ -1,0 +1,9 @@
+mutation {
+  # createUser(data: {
+  #   email: "test"
+  #   name: "test"
+  #   password: "test"
+  # }) {
+  #   id
+  # }
+}

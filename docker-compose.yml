@@ -1,0 +1,37 @@
+version: '3'
+services:
+  db:
+    image: postgres:10.5
+    restart: always
+    environment:
+      POSTGRES_DB: testdb
+      POSTGRES_USER: test
+      POSTGRES_PASSWORD: test
+      POSTGRES_ENCODING: UTF8
+    # volumes:
+    #   - postgres:/var/lib/postgresql/data
+  prisma:
+    image: prismagraphql/prisma:1.16.5
+    restart: always
+    ports:
+      - 4466:4466
+    environment:
+      PRISMA_CONFIG: |
+        port: 4466
+        managementApiSecret: test
+        databases:
+          default:
+            connector: postgres
+            host: db
+            port: 5432
+            database: testdb
+            user: test
+            password: test
+            migrations: true
+  adminer:
+    image: adminer
+    restart: always
+    ports:
+      - 8080:8080
+# volumes:
+#   postgres:
