@@ -1,0 +1,52 @@
+mutation {
+  createUser(data: {
+    name: "test"
+    email: "test@gmail.com"
+    password: "$2b$10$PDVdCPRXv6yXfAoBdAyDP.dgTJbH8p/EXu/xCjovC76GKf5GUvKky" # plaintext password: "test"
+    posts: {
+        create: [{
+            title: "Test Post 1",
+            body: "Hello World",
+            status: COMPLETED,
+        }, {
+            title: "Test Post 2",
+            body: "Hello World",
+            status: COMPLETED,
+        }, {
+            title: "Test Post 3",
+            body: "Hello World",
+            status: COMPLETED,
+        }, {
+            title: "Test Post 4",
+            body: "Hello World",
+            status: COMPLETED,
+        }, {
+            title: "Test Post 5",
+            body: "Hello World",
+            status: COMPLETED,
+        }, {
+            title: "Test Post 6",
+            body: "Hello World",
+            status: COMPLETED,
+        }, {
+            title: "Test Post 7",
+            body: "Hello World",
+            status: COMPLETED,
+        }, {
+            title: "Test Post 8",
+            body: "Hello World",
+            status: COMPLETED,
+        }, {
+            title: "Test Post 9",
+            body: "Hello World",
+            status: COMPLETED,
+        }, {
+            title: "Test Post 10",
+            body: "Hello World",
+            status: COMPLETED,
+        }]
+    }
+  }) {
+    id
+  }
+}
