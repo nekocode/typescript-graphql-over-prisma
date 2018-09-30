@@ -1,7 +1,6 @@
 import { IResolvers } from 'apollo-server'
-
-import { Query } from './query'
-import { Mutation } from './mutation'
+import { Query } from './Query'
+import { Mutation } from './Mutation'
 
 export const resolvers: IResolvers = {
   Query,
