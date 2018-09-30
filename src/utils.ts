@@ -1,4 +1,5 @@
 import { verify } from 'jsonwebtoken'
+import { GraphQLResolveInfo } from 'graphql'
 import { Context } from '.'
 
 export const APP_SECRET = 'test'
@@ -19,4 +20,11 @@ export function getUserId(ctx: Context) {
   }
 
   throw new AuthError()
+}
+
+export function forwardTo(bindingName: string) {
+  return async (root, args, ctx: Context, info: GraphQLResolveInfo) => {
+    const prismaFunc: Function = ctx[bindingName]['types'][info.parentType.name][info.fieldName]
+    return prismaFunc(args, info)
+  }
 }
