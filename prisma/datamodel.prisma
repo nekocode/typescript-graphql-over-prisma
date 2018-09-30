@@ -5,4 +5,20 @@ type User {
   name: String!
   email: String! @unique
   password: String!
+  posts: [Post!]! @relation(name: "Entries", onDelete: CASCADE)
+}
+
+type Post {
+  id: ID! @unique
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  author: User! @relation(name: "Entries")
+  title: String!
+  body: String!
+  status: PostStatus!
+}
+
+enum PostStatus {
+  IN_PROGRESS
+  COMPLETED
 }
