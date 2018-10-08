@@ -2,9 +2,9 @@ import { IResolvers, IGraphQLToolsResolveInfo } from 'apollo-server'
 import { execute, makePromise } from 'apollo-link'
 import gql from 'graphql-tag'
 import { hash, compare } from 'bcrypt'
-import { sign } from 'jsonwebtoken'
 import { Context } from '..'
-import { APP_SECRET, getSubschema } from '../utils'
+import { sign } from '../auth'
+import { getSubschema } from '../utils'
 
 export const Mutation: IResolvers = {
   signup: {
@@ -23,7 +23,7 @@ export const Mutation: IResolvers = {
       })) as any).data.createUser;
 
       return {
-        token: sign({ userId: user.id }, APP_SECRET),
+        token: sign({ userId: user.id }),
         user,
       }
     }
@@ -52,7 +52,7 @@ export const Mutation: IResolvers = {
       }
 
       return {
-        token: sign({ userId: user.id }, APP_SECRET),
+        token: sign({ userId: user.id }),
         user,
       }
     }
