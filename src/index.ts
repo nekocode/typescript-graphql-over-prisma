@@ -1,23 +1,44 @@
-import { ApolloServer, gql } from 'apollo-server'
-import { importSchema } from "graphql-import";
+import {
+  ApolloServer,
+  makeRemoteExecutableSchema,
+  mergeSchemas,
+} from 'apollo-server'
+import { GraphQLSchema } from 'graphql'
+import { HttpLink } from 'apollo-link-http'
+import { importSchema } from "graphql-import"
+import { fetch } from 'cross-fetch' // https://github.com/apollographql/apollo-link/issues/513
 import { IncomingMessage, ServerResponse } from 'http'
-import { Prisma, prisma as db } from './generated/prisma-client'
 import { resolvers } from './resolvers'
-
 
 export interface Context {
   req: IncomingMessage,
   res: ServerResponse,
-  db: Prisma,
+  prismaSchema: GraphQLSchema,
+  prismaLink: HttpLink,
 }
 
+const prismaLink = new HttpLink({
+  fetch: fetch,
+  uri: 'http://localhost:4466',
+});
+
+const prismaSchema = makeRemoteExecutableSchema({
+  link: prismaLink,
+  schema: importSchema('src/generated/prisma.graphql'),
+});
+
 const server = new ApolloServer({
-  typeDefs: importSchema('src/schema.graphql'),
-  resolvers,
+  schema: mergeSchemas({
+    schemas: [
+      prismaSchema,
+      importSchema('src/schema.graphql'),
+    ],
+    resolvers,
+  }),
   context: async ({ req, res }): Promise<Context> => {
-    return { req, res, db }
+    return { req, res, prismaSchema, prismaLink }
   },
-} as any)
+});
 
 server.listen().then(({ url }) => {
   console.log(`🚀 Server ready at ${url}`);
