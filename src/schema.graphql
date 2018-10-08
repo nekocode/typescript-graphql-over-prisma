@@ -2,7 +2,6 @@
 
 type Query {
   me: User!
-  posts(where: PostWhereInput, orderBy: PostOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [Post]!
 }
 
 type Mutation {
@@ -15,6 +14,7 @@ type AuthPayload {
   user: User!
 }
 
+# Override
 type User {
   id: ID!
   email: String!
