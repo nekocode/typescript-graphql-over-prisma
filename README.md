@@ -4,9 +4,9 @@ It is based on the [prisma official example](https://github.com/prisma/prisma-ex
 
 * Replace graphql-yoga with apollo-server
 
-* Add a new [`Post`](prisma/datamodel.prisma#L11-L19) model and forwarding it's queries to prisma server
+* Add a new [`Post`](prisma/datamodel.prisma#L11-L19) model
 
-* Manually modify and delegate requests to prisma server in [some cases](src/resolvers/Mutation.ts#L14-L23)
+* In [some cases](src/resolvers/Mutation.ts#L14-L23), manually modify requests before forwarding to prisma server 
 
 ## Get started
 
