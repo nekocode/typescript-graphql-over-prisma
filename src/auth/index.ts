@@ -21,9 +21,12 @@ export function getLoggedUserId(ctx: Context) {
   const auth = ctx.req.headers.authorization
 
   if (auth) {
-    const token = auth.replace('Bearer ', '')
-    const verifiedToken: any = verify(token, APP_SECRET)
-    return verifiedToken && verifiedToken.userId
+    try {
+      const token = auth.replace('Bearer ', '')
+      const verifiedToken: any = verify(token, APP_SECRET)
+      return verifiedToken && verifiedToken.userId
+    } catch (ignored) {
+    }
   }
 
   throw new AuthError()
