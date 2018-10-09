@@ -1,6 +1,6 @@
 import { IResolvers, IGraphQLToolsResolveInfo } from 'graphql-tools'
-import { Context } from '..'
-import { getLoggedUserId } from '../auth'
+import { Context } from '../universal'
+import { getLoggedUserId } from '../utils'
 
 export const Query: IResolvers = {
   me: {
