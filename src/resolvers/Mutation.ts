@@ -2,9 +2,8 @@ import { IResolvers, IGraphQLToolsResolveInfo } from 'apollo-server'
 import { execute, makePromise } from 'apollo-link'
 import gql from 'graphql-tag'
 import { hash, compare } from 'bcrypt'
-import { Context } from '..'
-import { sign } from '../auth'
-import { getSubschema } from '../utils'
+import { Context } from '../universal'
+import { getSubschema, sign } from '../utils'
 
 export const Mutation: IResolvers = {
   signup: {
