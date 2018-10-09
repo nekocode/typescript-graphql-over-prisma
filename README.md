@@ -4,7 +4,7 @@ It is based on the [prisma official example](https://github.com/prisma/prisma-ex
 
 * Replace graphql-yoga with apollo-server
 
-* Add a new [`Post`](prisma/datamodel.prisma#L11-L19) model
+* [Merge custom schema with prisma schema](src/index.ts#L27-L33)
 
 * In [some cases](src/resolvers/Mutation.ts#L14-L23), send custom graphql requests to prisma server manually
 
