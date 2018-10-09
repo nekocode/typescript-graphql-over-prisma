@@ -1,13 +1,6 @@
 import { verify, sign as _sign, Secret, SignOptions } from 'jsonwebtoken'
-import { Context } from '..'
-
-const APP_SECRET = 'test'
-
-class AuthError extends Error {
-  constructor() {
-    super('Not authorized')
-  }
-}
+import { AuthenticationError } from 'apollo-server'
+import { Context, APP_SECRET } from '../universal'
 
 export function sign(
   payload: string | Buffer | object,
@@ -29,5 +22,5 @@ export function getLoggedUserId(ctx: Context) {
     }
   }
 
-  throw new AuthError()
+  throw new AuthenticationError('Not authorized')
 }
