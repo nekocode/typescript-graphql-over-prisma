@@ -1,5 +1,5 @@
 import { verify, sign as _sign, Secret, SignOptions } from 'jsonwebtoken'
-import { AuthenticationError } from 'apollo-server'
+import { IGraphQLToolsResolveInfo, AuthenticationError, ForbiddenError } from 'apollo-server'
 import { Context, APP_SECRET } from '../universal'
 
 export function sign(
@@ -23,4 +23,11 @@ export function getLoggedUserId(ctx: Context) {
   }
 
   throw new AuthenticationError('Not authorized')
+}
+
+export function checkPermissionsForPrisma(root, args, context: Context, info: IGraphQLToolsResolveInfo) {
+  if (info.operation.operation === 'mutation') {
+    throw new ForbiddenError('Operation forbidden')
+  }
+  const userId = getLoggedUserId(context)
 }
