@@ -9,7 +9,7 @@ import { importSchema } from "graphql-import"
 import { fetch } from 'cross-fetch' // https://github.com/apollographql/apollo-link/issues/513
 import { resolvers } from './resolvers'
 import { Context } from './universal'
-import { checkPermissionsForPrisma } from './utils'
+import { rootResolveFunctionForPrisma } from './utils'
 
 const prismaLink = new HttpLink({
   fetch: fetch,
@@ -21,7 +21,7 @@ const prismaSchema = makeRemoteExecutableSchema({
   schema: importSchema('src/generated/prisma.graphql'),
 });
 
-addSchemaLevelResolveFunction(prismaSchema, checkPermissionsForPrisma)
+addSchemaLevelResolveFunction(prismaSchema, rootResolveFunctionForPrisma)
 
 const server = new ApolloServer({
   schema: mergeSchemas({

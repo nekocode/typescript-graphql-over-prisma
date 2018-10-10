@@ -1,6 +1,6 @@
 import { GraphQLResolveInfo, SelectionNode, FieldNode, FragmentSpreadNode, InlineFragmentNode, FragmentDefinitionNode, print } from 'graphql'
 
-export function getSubschema(info: GraphQLResolveInfo, fieldName: string): string {
+export function getSubnode(info: GraphQLResolveInfo, fieldName: string): string {
   let queryFields = ''
   const subNode = searchNode(fieldName, info)
   if (subNode) {

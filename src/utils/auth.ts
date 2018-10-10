@@ -25,9 +25,15 @@ export function getLoggedUserId(ctx: Context) {
   throw new AuthenticationError('Not authorized')
 }
 
-export function checkPermissionsForPrisma(root, args, context: Context, info: IGraphQLToolsResolveInfo) {
-  if (info.operation.operation === 'mutation') {
-    throw new ForbiddenError('Operation forbidden')
+export function rootResolveFunctionForPrisma(root, args, context: Context, info: IGraphQLToolsResolveInfo) {
+  if (info.operation.operation == 'query') {
+    if (info.path.key === 'users') {
+      throw new ForbiddenError('Operation forbidden')
+    }
+  } else if (info.operation.operation == 'mutation' ||
+    info.operation.operation == 'subscription') {
+      throw new ForbiddenError('Operation forbidden')
   }
+
   const userId = getLoggedUserId(context)
 }

@@ -3,7 +3,7 @@ import { execute, makePromise } from 'apollo-link'
 import gql from 'graphql-tag'
 import { hash, compare } from 'bcrypt'
 import { Context } from '../universal'
-import { getSubschema, sign } from '../utils'
+import { getSubnode, sign } from '../utils'
 
 export const Mutation: IResolvers = {
   signup: {
@@ -15,7 +15,7 @@ export const Mutation: IResolvers = {
         mutation {
           createUser(data: {email: "${email}", password: "${hashedPassword}", name: "${name}"}) {
             id,
-            ${getSubschema(info, 'user')}
+            ${getSubnode(info, 'user')}
           }
         }
         `
@@ -35,7 +35,7 @@ export const Mutation: IResolvers = {
         query {
           user(where: {email: "${email}"}) {
             id, password,
-            ${getSubschema(info, 'user')}
+            ${getSubnode(info, 'user')}
           }
         }
         `
