@@ -1,12 +1,15 @@
-# import Post from "./generated/prisma.graphql"
+# import Post, PostStatus, PostOrderByInput from "./generated/prisma.graphql"
 
 type Query {
   me: User!
+  posts(orderBy: PostOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [Post]!
 }
 
 type Mutation {
   signup(name: String!, email: String!, password: String!): AuthPayload!
   login(email: String!, password: String!): AuthPayload!
+  createPost(title: String!, body: String!, status: PostStatus!): Post!
+  deletePost(id: ID!): Post
 }
 
 type AuthPayload {
