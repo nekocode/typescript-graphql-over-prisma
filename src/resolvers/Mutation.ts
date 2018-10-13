@@ -38,7 +38,6 @@ export const Mutation: IResolvers = {
         usedFragments: userFragments,
       } = new ResolveInfoNode(info).child('user').print();
 
-      console.log(userFields + ',,,\n' + userFragments)
       const user = (await queryPrisma(context, `
         query {
           user(where: {email: "${email}"}) {
