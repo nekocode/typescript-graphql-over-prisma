@@ -18,14 +18,14 @@ import {
 } from 'graphql';
 
 export interface PrintResult {
-  fields: string,
+  childFields: string,
   usedFragments: string,
 }
 
 export class ResolveInfoNode {
   private readonly info: GraphQLResolveInfo;
   private readonly rootFields: FieldNode[];
-  private readonly fields: FieldNode[];
+  private readonly expandedChildFields: FieldNode[];
 
   constructor(
     info: GraphQLResolveInfo,
@@ -35,9 +35,9 @@ export class ResolveInfoNode {
     this.info = info;
     this.rootFields = rootFields || [info.fieldNodes[0]];
 
-    this.fields = [];
+    this.expandedChildFields = [];
     for (const rootField of this.rootFields) {
-      const { fields } = collectFields(
+      const { childFields } = collectFields(
         rootField,
         info.schema,
         info.variableValues,
@@ -45,7 +45,7 @@ export class ResolveInfoNode {
         returnType,
       );
 
-      this.fields.push(...fields);
+      this.expandedChildFields.push(...childFields);
     }
   }
 
@@ -53,7 +53,7 @@ export class ResolveInfoNode {
     childNodeName: string,
     returnType: GraphQLObjectType = null
   ): ResolveInfoNode {
-    const targetFields = this.fields
+    const targetFields = this.expandedChildFields
       .filter(field => getFieldEntryKey(field) === childNodeName);
     if (targetFields.length == 0) {
       throw Error(`Child node "${childNodeName} not found."`);
@@ -67,13 +67,13 @@ export class ResolveInfoNode {
   }
 
   print(): PrintResult {
-    if (this.fields.length == 0) {
+    if (this.expandedChildFields.length == 0) {
       return {
-        fields: '',
+        childFields: '',
         usedFragments: '',
       };
     }
-    const allUsedFragments = this.fields
+    const allUsedFragments = this.expandedChildFields
       .map(field => {
         return collectAllUsedFragments(
           field,
@@ -85,13 +85,13 @@ export class ResolveInfoNode {
       .reduce((pV, cV) => mergeMap([pV, cV]));
 
     return {
-      fields: printNodes(this.fields),
+      childFields: printNodes(this.expandedChildFields),
       usedFragments: printNodes(Array.from(allUsedFragments.values())),
     };
   }
 
   hasChild(childNodeName: string): boolean {
-    for (const field of this.fields) {
+    for (const field of this.expandedChildFields) {
       if (getFieldEntryKey(field) === childNodeName) {
         return true;
       }
@@ -118,7 +118,7 @@ function collectAllUsedFragments(
   let allUsedFragments: Map<string, FragmentDefinitionNode> = new Map();
 
   function collectUsedFragments(_rootField: FieldNode) {
-    const {fields, usedFragments} = collectFields(
+    const {childFields, usedFragments} = collectFields(
       _rootField,
       schema,
       variableValues,
@@ -126,7 +126,7 @@ function collectAllUsedFragments(
     );
     allUsedFragments = mergeMap([allUsedFragments, usedFragments]);
 
-    for (const field of fields) {
+    for (const field of childFields) {
       collectUsedFragments(field);
     }
   }
@@ -135,8 +135,8 @@ function collectAllUsedFragments(
   return allUsedFragments;
 }
 
-interface FieldsAndUsedFragments {
-  fields: FieldNode[],
+interface CollectFieldsResult {
+  childFields: FieldNode[],
   usedFragments: Map<string, FragmentDefinitionNode>,
 }
 
@@ -146,16 +146,16 @@ function collectFields(
   variableValues: { [variableName: string]: any },
   fragments: { [key: string]: FragmentDefinitionNode },
   runtimeType: GraphQLObjectType = null,
-): FieldsAndUsedFragments {
+): CollectFieldsResult {
   if (!rootField.selectionSet) {
     return {
-      fields: [],
+      childFields: [],
       usedFragments: new Map(),
     };
   }
 
   const usedFragments: Map<string, FragmentDefinitionNode> = new Map();
-  const fields: FieldNode[] = [];
+  const childFields: FieldNode[] = [];
 
   function walk(selections: ReadonlyArray<SelectionNode>) {
     for (const selection of selections) {
@@ -164,7 +164,7 @@ function collectFields(
           if (!shouldIncludeNode(selection, variableValues)) {
             continue;
           }
-          fields.push(selection);
+          childFields.push(selection);
           break;
         case Kind.INLINE_FRAGMENT:
           if (
@@ -198,7 +198,7 @@ function collectFields(
   walk(rootField.selectionSet.selections);
 
   return {
-    fields,
+    childFields,
     usedFragments
   };
 }

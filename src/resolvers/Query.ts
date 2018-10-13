@@ -7,7 +7,7 @@ export const Query: IResolvers = {
   me: {
     async resolve(root, args, context: Context, info: GraphQLResolveInfo) {
       const {
-        fields: userFields,
+        childFields: userFields,
         usedFragments: userFragments,
       } = new ResolveInfoNode(info).print();
       const loggedUserId = getLoggedUserId(context);
