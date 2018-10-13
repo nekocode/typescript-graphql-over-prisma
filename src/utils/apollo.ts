@@ -1,6 +1,6 @@
 import { parse } from 'graphql';
 import { execute, makePromise, GraphQLRequest } from 'apollo-link';
-import { Context } from '../universal'
+import { Context } from '../universal';
 
 export async function queryPrisma(
   context: Context,

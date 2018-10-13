@@ -8,7 +8,7 @@ export const Mutation: IResolvers = {
   signup: {
     async resolve(root, { email, password, name }, context: Context, info: GraphQLResolveInfo) {
       const {
-        fields: userFields,
+        childFields: userFields,
         usedFragments: userFragments,
       } = new ResolveInfoNode(info).child('user').print();
       const hashedPassword = await hash(password, 10);
@@ -34,10 +34,11 @@ export const Mutation: IResolvers = {
   login: {
     async resolve(root, { email, password }, context: Context, info: GraphQLResolveInfo) {
       const {
-        fields: userFields,
+        childFields: userFields,
         usedFragments: userFragments,
       } = new ResolveInfoNode(info).child('user').print();
 
+      console.log(userFields + ',,,\n' + userFragments)
       const user = (await queryPrisma(context, `
         query {
           user(where: {email: "${email}"}) {
@@ -68,7 +69,7 @@ export const Mutation: IResolvers = {
   createPost: {
     async resolve(root, { title, body, status }, context: Context, info: GraphQLResolveInfo) {
       const {
-        fields: postFields,
+        childFields: postFields,
         usedFragments: postFragments,
       } = new ResolveInfoNode(info).print();
       const loggedUserId = getLoggedUserId(context);
@@ -90,7 +91,7 @@ export const Mutation: IResolvers = {
   deletePost: {
     async resolve(root, { id: postId }, context: Context, info: GraphQLResolveInfo) {
       const {
-        fields: postFields,
+        childFields: postFields,
         usedFragments: postFragments,
       } = new ResolveInfoNode(info).print();
       const loggedUserId = getLoggedUserId(context);
