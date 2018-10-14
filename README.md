@@ -1,12 +1,12 @@
-This example demonstrates how to implement a GraphQL server with an email-password-based authentication workflow using TypeScript based on [prisma](https://github.com/prisma/prisma) & [apollo-server](https://github.com/apollographql/apollo-server).
+This example demonstrates how to build a GraphQL server over [Prisma](https://github.com/prisma/prisma) using TypeScript & [apollo-server](https://github.com/apollographql/apollo-server).
 
-It is based on the [prisma official example](https://github.com/prisma/prisma-examples/tree/master/typescript-graphql-auth), but includes many modifications and enhancements, such as:
+It inlcudes below features:
 
-* Replace graphql-yoga with apollo-server
+* An implementation of email-password-based authentication workflow.
 
-* [Merge custom schema with prisma schema](src/index.ts#L27-L33)
+* GraphQL over GraphQL/Prisma.
 
-* In [some cases](src/resolvers/Mutation.ts#L14-L23), send custom graphql requests to prisma server manually
+* [Customized GraphQl queries](src/resolvers/Mutation.ts#L36-L50) which base on the resolve info.
 
 ## Get started
 
