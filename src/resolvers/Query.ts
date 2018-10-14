@@ -1,7 +1,7 @@
 import { GraphQLResolveInfo, parse, print } from 'graphql';
 import { IResolvers } from 'apollo-server';
 import { Context } from '../universal';
-import { ResolveInfoNode, getLoggedUserId, queryPrisma } from '../utils';
+import { parseResolveInfo, getLoggedUserId, queryPrisma } from '../utils';
 
 export const Query: IResolvers = {
   me: {
@@ -9,7 +9,7 @@ export const Query: IResolvers = {
       const {
         childFields: userFields,
         usedFragments: userFragments,
-      } = new ResolveInfoNode(info).print();
+      } = parseResolveInfo(info).print();
       const loggedUserId = getLoggedUserId(context);
 
       const user = (await queryPrisma(context, `

@@ -2,7 +2,7 @@ import { GraphQLResolveInfo, parse } from 'graphql';
 import { IResolvers } from 'apollo-server';
 import { hash, compare } from 'bcrypt';
 import { Context } from '../universal';
-import { ResolveInfoNode, sign, getLoggedUserId, queryPrisma } from '../utils';
+import { parseResolveInfo, sign, getLoggedUserId, queryPrisma } from '../utils';
 
 export const Mutation: IResolvers = {
   signup: {
@@ -10,7 +10,7 @@ export const Mutation: IResolvers = {
       const {
         childFields: userFields,
         usedFragments: userFragments,
-      } = new ResolveInfoNode(info).child('user').print();
+      } = parseResolveInfo(info).child('user').print();
       const hashedPassword = await hash(password, 10);
 
       const user = (await queryPrisma(context, `
@@ -36,7 +36,7 @@ export const Mutation: IResolvers = {
       const {
         childFields: userFields,
         usedFragments: userFragments,
-      } = new ResolveInfoNode(info).child('user').print();
+      } = parseResolveInfo(info).child('user').print();
 
       const user = (await queryPrisma(context, `
         query {
@@ -70,7 +70,7 @@ export const Mutation: IResolvers = {
       const {
         childFields: postFields,
         usedFragments: postFragments,
-      } = new ResolveInfoNode(info).print();
+      } = parseResolveInfo(info).print();
       const loggedUserId = getLoggedUserId(context);
 
       const post = (await queryPrisma(context, `
@@ -92,7 +92,7 @@ export const Mutation: IResolvers = {
       const {
         childFields: postFields,
         usedFragments: postFragments,
-      } = new ResolveInfoNode(info).print();
+      } = parseResolveInfo(info).print();
       const loggedUserId = getLoggedUserId(context);
 
       const post = (await queryPrisma(context, `

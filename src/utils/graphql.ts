@@ -3,6 +3,7 @@ import {
   GraphQLObjectType,
   GraphQLResolveInfo,
   ASTNode,
+  SelectionSetNode,
   SelectionNode,
   FieldNode,
   InlineFragmentNode,
@@ -22,18 +23,27 @@ export interface PrintResult {
   usedFragments: string,
 }
 
+export function parseResolveInfo(
+  info: GraphQLResolveInfo,
+  runtimeType: GraphQLObjectType = null
+): ResolveInfoNode {
+  return new ResolveInfoNode(info, null, runtimeType);
+}
+
 export class ResolveInfoNode {
   private readonly info: GraphQLResolveInfo;
   private readonly rootFields: FieldNode[];
+  private readonly runtimeType: GraphQLObjectType;
   private readonly expandedChildFields: FieldNode[];
 
   constructor(
     info: GraphQLResolveInfo,
     rootFields: FieldNode[] = null,
-    returnType: GraphQLObjectType = null,
+    runtimeType: GraphQLObjectType = null,
   ) {
     this.info = info;
     this.rootFields = rootFields || [info.fieldNodes[0]];
+    this.runtimeType = runtimeType;
 
     this.expandedChildFields = [];
     for (const rootField of this.rootFields) {
@@ -42,7 +52,7 @@ export class ResolveInfoNode {
         info.schema,
         info.variableValues,
         info.fragments,
-        returnType,
+        runtimeType,
       );
 
       this.expandedChildFields.push(...childFields);
@@ -51,7 +61,7 @@ export class ResolveInfoNode {
 
   child(
     childNodeName: string,
-    returnType: GraphQLObjectType = null
+    runtimeType: GraphQLObjectType = null
   ): ResolveInfoNode {
     const targetFields = this.expandedChildFields
       .filter(field => getFieldEntryKey(field) === childNodeName);
@@ -62,7 +72,7 @@ export class ResolveInfoNode {
     return new ResolveInfoNode(
       this.info,
       targetFields,
-      returnType,
+      runtimeType,
     );
   }
 
@@ -73,7 +83,24 @@ export class ResolveInfoNode {
         usedFragments: '',
       };
     }
-    const allUsedFragments = this.expandedChildFields
+
+    let childNodes: SelectionNode[];
+    let nodesToCollectFragments: SelectionNode[];
+    let usedFragments: Map<string, FragmentDefinitionNode>;
+    if (this.runtimeType == null) {
+      childNodes = [];
+      for (const rootField of this.rootFields) {
+        for (const field of rootField.selectionSet.selections) {
+          childNodes.push(field);
+        }
+      }
+      nodesToCollectFragments = this.rootFields;
+    } else {
+      childNodes = this.expandedChildFields;
+      nodesToCollectFragments = childNodes;
+    }
+
+    const allUsedFragments = nodesToCollectFragments
       .map(field => {
         return collectAllUsedFragments(
           field,
@@ -85,7 +112,7 @@ export class ResolveInfoNode {
       .reduce((pV, cV) => mergeMap([pV, cV]));
 
     return {
-      childFields: printNodes(this.expandedChildFields),
+      childFields: printNodes(childNodes),
       usedFragments: printNodes(Array.from(allUsedFragments.values())),
     };
   }
@@ -105,21 +132,21 @@ function printNodes(nodes: ASTNode[], separator: string = '\n'): string {
     return '';
   }
   return nodes
-    .map(fragment => print(fragment))
+    .map(node => print(node))
     .reduce((pV, cV) => pV + separator + cV);
 }
 
 function collectAllUsedFragments(
-  rootField: FieldNode,
+  rootNode: SelectionNode,
   schema: GraphQLSchema,
   variableValues: { [variableName: string]: any },
   fragments: { [key: string]: FragmentDefinitionNode },
 ): Map<string, FragmentDefinitionNode> {
   let allUsedFragments: Map<string, FragmentDefinitionNode> = new Map();
 
-  function collectUsedFragments(_rootField: FieldNode) {
-    const {childFields, usedFragments} = collectFields(
-      _rootField,
+  function collectUsedFragments(_rootNode: SelectionNode) {
+    const { childFields, usedFragments } = collectFields(
+      _rootNode,
       schema,
       variableValues,
       fragments
@@ -130,7 +157,7 @@ function collectAllUsedFragments(
       collectUsedFragments(field);
     }
   }
-  collectUsedFragments(rootField);
+  collectUsedFragments(rootNode);
 
   return allUsedFragments;
 }
@@ -141,13 +168,20 @@ interface CollectFieldsResult {
 }
 
 function collectFields(
-  rootField: FieldNode,
+  rootNode: SelectionNode,
   schema: GraphQLSchema,
   variableValues: { [variableName: string]: any },
   fragments: { [key: string]: FragmentDefinitionNode },
   runtimeType: GraphQLObjectType = null,
 ): CollectFieldsResult {
-  if (!rootField.selectionSet) {
+  let selectionSet: SelectionSetNode;
+  if (rootNode.kind === Kind.FRAGMENT_SPREAD) {
+    selectionSet = fragments[rootNode.name.value].selectionSet;
+  } else {
+    selectionSet = rootNode.selectionSet;
+  }
+
+  if (!selectionSet) {
     return {
       childFields: [],
       usedFragments: new Map(),
@@ -195,7 +229,7 @@ function collectFields(
       }
     }
   }
-  walk(rootField.selectionSet.selections);
+  walk(selectionSet.selections);
 
   return {
     childFields,
@@ -251,10 +285,10 @@ function getFieldEntryKey(node: FieldNode): string {
   return node.alias ? node.alias.value : node.name.value;
 }
 
-function mergeMap<K,V>(maps: Map<K, V>[]): Map<K, V> {
+function mergeMap<K, V>(maps: Map<K, V>[]): Map<K, V> {
   const mergedMap: Map<K, V> = new Map();
   for (const map of maps) {
-    for(const [k, v] of Array.from(map.entries())) {
+    for (const [k, v] of Array.from(map.entries())) {
       mergedMap.set(k, v);
     }
   }
