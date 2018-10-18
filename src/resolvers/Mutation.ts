@@ -6,7 +6,7 @@ import { getLoggedUserId, parseResolveInfo, queryPrisma, sign } from "../utils";
 
 export const Mutation: IResolvers = {
   signup: {
-    async resolve(root, { email, password, name }, context: IContext, info: GraphQLResolveInfo) {
+    async resolve(parent, { email, password, name }, context: IContext, info: GraphQLResolveInfo) {
       const {
         childFields: userFields,
         usedFragments: userFragments,
@@ -32,7 +32,7 @@ export const Mutation: IResolvers = {
   },
 
   login: {
-    async resolve(root, { email, password }, context: IContext, info: GraphQLResolveInfo) {
+    async resolve(parent, { email, password }, context: IContext, info: GraphQLResolveInfo) {
       const {
         childFields: userFields,
         usedFragments: userFragments,
@@ -66,7 +66,7 @@ export const Mutation: IResolvers = {
   },
 
   createPost: {
-    async resolve(root, { title, body, status }, context: IContext, info: GraphQLResolveInfo) {
+    async resolve(parent, { title, body, status }, context: IContext, info: GraphQLResolveInfo) {
       const {
         childFields: postFields,
         usedFragments: postFragments,
@@ -89,7 +89,7 @@ export const Mutation: IResolvers = {
   },
 
   deletePost: {
-    async resolve(root, { id: postId }, context: IContext, info: GraphQLResolveInfo) {
+    async resolve(parent, { id: postId }, context: IContext, info: GraphQLResolveInfo) {
       const {
         childFields: postFields,
         usedFragments: postFragments,

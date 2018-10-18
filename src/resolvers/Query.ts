@@ -5,7 +5,7 @@ import { getLoggedUserId, parseResolveInfo, queryPrisma } from "../utils";
 
 export const Query: IResolvers = {
   me: {
-    async resolve(root, args, context: IContext, info: GraphQLResolveInfo) {
+    async resolve(parent, args, context: IContext, info: GraphQLResolveInfo) {
       const {
         childFields: userFields,
         usedFragments: userFragments,
@@ -27,7 +27,7 @@ export const Query: IResolvers = {
   },
 
   posts: {
-    async resolve(root, args, context: IContext, info: GraphQLResolveInfo) {
+    async resolve(parent, args, context: IContext, info: GraphQLResolveInfo) {
       const posts = (await queryPrisma(context, `
         {${print(info.fieldNodes[0])}}
         `,
