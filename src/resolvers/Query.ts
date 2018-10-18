@@ -1,7 +1,7 @@
 import { IResolvers } from "apollo-server";
 import { GraphQLResolveInfo, print } from "graphql";
 import { IContext } from "../universal";
-import { getLoggedUserId, parseResolveInfo, queryPrisma } from "../utils";
+import { getLoggedUserId, parseResolveInfo, printFragments, queryPrisma } from "../utils";
 
 export const Query: IResolvers = {
   me: {
@@ -29,7 +29,8 @@ export const Query: IResolvers = {
   posts: {
     async resolve(parent, args, context: IContext, info: GraphQLResolveInfo) {
       const posts = (await queryPrisma(context, `
-        {${print(info.fieldNodes[0])}}
+        query {${print(info.fieldNodes[0])}}
+        ${printFragments(info)}
         `,
       )).posts;
 

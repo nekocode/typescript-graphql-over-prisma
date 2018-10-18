@@ -126,6 +126,12 @@ export class ResolveInfoNode {
   }
 }
 
+export function printFragments(info: GraphQLResolveInfo): string {
+  const fragments =  Object.keys(info.fragments)
+    .map((k) => info.fragments[k]);
+  return printNodes(fragments);
+}
+
 function printNodes(nodes: ASTNode[], separator: string = "\n"): string {
   if (nodes.length === 0) {
     return "";
