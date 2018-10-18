@@ -8,6 +8,7 @@ import { fetch } from "cross-fetch";
 import { importSchema } from "graphql-import";
 import { resolvers } from "./resolvers";
 import { IContext } from "./universal";
+import { logger } from "./utils";
 
 const prismaLink = new HttpLink({
   fetch,
@@ -25,5 +26,5 @@ const server = new ApolloServer({
 });
 
 server.listen().then(({ url }) => {
-  console.log(`🚀 Server ready at ${url}`);
+  logger.info(`🚀 Server ready at ${url}`);
 });
