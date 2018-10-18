@@ -1,31 +1,31 @@
 import {
-  GraphQLSchema,
+  ASTNode,
+  FieldNode,
+  FragmentDefinitionNode,
+  FragmentSpreadNode,
+  getDirectiveValues,
+  GraphQLIncludeDirective,
   GraphQLObjectType,
   GraphQLResolveInfo,
-  ASTNode,
-  SelectionSetNode,
-  SelectionNode,
-  FieldNode,
-  InlineFragmentNode,
-  FragmentSpreadNode,
-  FragmentDefinitionNode,
-  Kind,
+  GraphQLSchema,
   GraphQLSkipDirective,
-  GraphQLIncludeDirective,
-  getDirectiveValues,
-  typeFromAST,
+  InlineFragmentNode,
   isAbstractType,
+  Kind,
   print,
-} from 'graphql';
+  SelectionNode,
+  SelectionSetNode,
+  typeFromAST,
+} from "graphql";
 
-export interface PrintResult {
-  childFields: string,
-  usedFragments: string,
+export interface IPrintResult {
+  childFields: string;
+  usedFragments: string;
 }
 
 export function parseResolveInfo(
   info: GraphQLResolveInfo,
-  runtimeType: GraphQLObjectType = null
+  runtimeType: GraphQLObjectType = null,
 ): ResolveInfoNode {
   return new ResolveInfoNode(info, null, runtimeType);
 }
@@ -59,13 +59,13 @@ export class ResolveInfoNode {
     }
   }
 
-  child(
+  public child(
     childNodeName: string,
-    runtimeType: GraphQLObjectType = null
+    runtimeType: GraphQLObjectType = null,
   ): ResolveInfoNode {
     const targetFields = this.expandedChildFields
-      .filter(field => getFieldEntryKey(field) === childNodeName);
-    if (targetFields.length == 0) {
+      .filter((field) => getFieldEntryKey(field) === childNodeName);
+    if (targetFields.length === 0) {
       throw Error(`Child node "${childNodeName} not found."`);
     }
 
@@ -76,17 +76,16 @@ export class ResolveInfoNode {
     );
   }
 
-  print(): PrintResult {
-    if (this.expandedChildFields.length == 0) {
+  public print(): IPrintResult {
+    if (this.expandedChildFields.length === 0) {
       return {
-        childFields: '',
-        usedFragments: '',
+        childFields: "",
+        usedFragments: "",
       };
     }
 
     let childNodes: SelectionNode[];
     let nodesToCollectFragments: SelectionNode[];
-    let usedFragments: Map<string, FragmentDefinitionNode>;
     if (this.runtimeType == null) {
       childNodes = [];
       for (const rootField of this.rootFields) {
@@ -101,7 +100,7 @@ export class ResolveInfoNode {
     }
 
     const allUsedFragments = nodesToCollectFragments
-      .map(field => {
+      .map((field) => {
         return collectAllUsedFragments(
           field,
           this.info.schema,
@@ -117,7 +116,7 @@ export class ResolveInfoNode {
     };
   }
 
-  hasChild(childNodeName: string): boolean {
+  public hasChild(childNodeName: string): boolean {
     for (const field of this.expandedChildFields) {
       if (getFieldEntryKey(field) === childNodeName) {
         return true;
@@ -127,12 +126,12 @@ export class ResolveInfoNode {
   }
 }
 
-function printNodes(nodes: ASTNode[], separator: string = '\n'): string {
-  if (nodes.length == 0) {
-    return '';
+function printNodes(nodes: ASTNode[], separator: string = "\n"): string {
+  if (nodes.length === 0) {
+    return "";
   }
   return nodes
-    .map(node => print(node))
+    .map((node) => print(node))
     .reduce((pV, cV) => pV + separator + cV);
 }
 
@@ -144,12 +143,12 @@ function collectAllUsedFragments(
 ): Map<string, FragmentDefinitionNode> {
   let allUsedFragments: Map<string, FragmentDefinitionNode> = new Map();
 
-  function collectUsedFragments(_rootNode: SelectionNode) {
+  function collectUsedFragments(node: SelectionNode) {
     const { childFields, usedFragments } = collectFields(
-      _rootNode,
+      node,
       schema,
       variableValues,
-      fragments
+      fragments,
     );
     allUsedFragments = mergeMap([allUsedFragments, usedFragments]);
 
@@ -162,9 +161,9 @@ function collectAllUsedFragments(
   return allUsedFragments;
 }
 
-interface CollectFieldsResult {
-  childFields: FieldNode[],
-  usedFragments: Map<string, FragmentDefinitionNode>,
+interface ICollectFieldsResult {
+  childFields: FieldNode[];
+  usedFragments: Map<string, FragmentDefinitionNode>;
 }
 
 function collectFields(
@@ -173,7 +172,7 @@ function collectFields(
   variableValues: { [variableName: string]: any },
   fragments: { [key: string]: FragmentDefinitionNode },
   runtimeType: GraphQLObjectType = null,
-): CollectFieldsResult {
+): ICollectFieldsResult {
   let selectionSet: SelectionSetNode;
   if (rootNode.kind === Kind.FRAGMENT_SPREAD) {
     selectionSet = fragments[rootNode.name.value].selectionSet;
@@ -233,11 +232,14 @@ function collectFields(
 
   return {
     childFields,
-    usedFragments
+    usedFragments,
   };
 }
 
-function shouldIncludeNode(node: FragmentSpreadNode | FieldNode | InlineFragmentNode, variableValues: { [key: string]: any }): boolean {
+function shouldIncludeNode(
+  node: FragmentSpreadNode | FieldNode | InlineFragmentNode,
+  variableValues: { [key: string]: any },
+): boolean {
   const skip = getDirectiveValues(
     GraphQLSkipDirective,
     node,
@@ -285,7 +287,7 @@ function getFieldEntryKey(node: FieldNode): string {
   return node.alias ? node.alias.value : node.name.value;
 }
 
-function mergeMap<K, V>(maps: Map<K, V>[]): Map<K, V> {
+function mergeMap<K, V>(maps: Array<Map<K, V>>): Map<K, V> {
   const mergedMap: Map<K, V> = new Map();
   for (const map of maps) {
     for (const [k, v] of Array.from(map.entries())) {

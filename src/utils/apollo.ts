@@ -1,10 +1,10 @@
-import { parse } from 'graphql';
-import { execute, makePromise, GraphQLRequest } from 'apollo-link';
-import { Context } from '../universal';
+import { execute, GraphQLRequest, makePromise } from "apollo-link";
+import { parse } from "graphql";
+import { IContext } from "../universal";
 
 export async function queryPrisma(
-  context: Context,
-  querySchema: string
+  context: IContext,
+  querySchema: string,
 ): Promise<{ [key: string]: any }> {
   return (await makePromise(execute(context.prismaLink, {
     query: parse(querySchema),
@@ -12,8 +12,8 @@ export async function queryPrisma(
 }
 
 export async function rawQueryPrisma(
-  context: Context,
-  operation: GraphQLRequest
+  context: IContext,
+  operation: GraphQLRequest,
 ): Promise<{ [key: string]: any }> {
   return (await makePromise(execute(context.prismaLink, operation)) as any).data;
 }

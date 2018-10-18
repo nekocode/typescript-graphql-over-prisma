@@ -1,16 +1,16 @@
-import { GraphQLResolveInfo, parse } from 'graphql';
-import { IResolvers } from 'apollo-server';
-import { hash, compare } from 'bcrypt';
-import { Context } from '../universal';
-import { parseResolveInfo, sign, getLoggedUserId, queryPrisma } from '../utils';
+import { IResolvers } from "apollo-server";
+import { compare, hash } from "bcrypt";
+import { GraphQLResolveInfo, parse } from "graphql";
+import { IContext } from "../universal";
+import { getLoggedUserId, parseResolveInfo, queryPrisma, sign } from "../utils";
 
 export const Mutation: IResolvers = {
   signup: {
-    async resolve(root, { email, password, name }, context: Context, info: GraphQLResolveInfo) {
+    async resolve(root, { email, password, name }, context: IContext, info: GraphQLResolveInfo) {
       const {
         childFields: userFields,
         usedFragments: userFragments,
-      } = parseResolveInfo(info).child('user').print();
+      } = parseResolveInfo(info).child("user").print();
       const hashedPassword = await hash(password, 10);
 
       const user = (await queryPrisma(context, `
@@ -21,22 +21,22 @@ export const Mutation: IResolvers = {
           }
         }
         ${userFragments}
-        `
-      ))['createUser'];
+        `,
+      )).createUser;
 
       return {
         token: sign({ userId: user.id }),
         user,
       };
-    }
+    },
   },
 
   login: {
-    async resolve(root, { email, password }, context: Context, info: GraphQLResolveInfo) {
+    async resolve(root, { email, password }, context: IContext, info: GraphQLResolveInfo) {
       const {
         childFields: userFields,
         usedFragments: userFragments,
-      } = parseResolveInfo(info).child('user').print();
+      } = parseResolveInfo(info).child("user").print();
 
       const user = (await queryPrisma(context, `
         query {
@@ -46,8 +46,8 @@ export const Mutation: IResolvers = {
           }
         }
         ${userFragments}
-        `
-      ))['user'];
+        `,
+      )).user;
 
       if (!user) {
         throw new Error(`No user found for email: ${email}`);
@@ -55,18 +55,18 @@ export const Mutation: IResolvers = {
 
       const valid = await compare(password, user.password);
       if (!valid) {
-        throw new Error('Invalid password');
+        throw new Error("Invalid password");
       }
 
       return {
         token: sign({ userId: user.id }),
         user,
-      }
-    }
+      };
+    },
   },
 
   createPost: {
-    async resolve(root, { title, body, status }, context: Context, info: GraphQLResolveInfo) {
+    async resolve(root, { title, body, status }, context: IContext, info: GraphQLResolveInfo) {
       const {
         childFields: postFields,
         usedFragments: postFragments,
@@ -75,20 +75,21 @@ export const Mutation: IResolvers = {
 
       const post = (await queryPrisma(context, `
         mutation {
-          createPost(data: {title: "${title}", body: "${body}", status: ${status}, author: {connect: {id: "${loggedUserId}"}}}) {
+          createPost(data: {title: "${title}", body: "${body}", status: ${status},
+          author: {connect: {id: "${loggedUserId}"}}}) {
             ${postFields}
           }
         }
         ${postFragments}
-        `
-      ))['createPost'];
+        `,
+      )).createPost;
 
       return post;
-    }
+    },
   },
 
   deletePost: {
-    async resolve(root, { id: postId }, context: Context, info: GraphQLResolveInfo) {
+    async resolve(root, { id: postId }, context: IContext, info: GraphQLResolveInfo) {
       const {
         childFields: postFields,
         usedFragments: postFragments,
@@ -102,10 +103,10 @@ export const Mutation: IResolvers = {
           }
         }
         ${postFragments}
-        `
-      ))['deletePost'];
+        `,
+      )).deletePost;
 
       return post;
-    }
+    },
   },
-}
+};

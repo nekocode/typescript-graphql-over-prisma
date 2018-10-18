@@ -1,1 +1,1 @@
-export const APP_SECRET = 'test';
+export const APP_SECRET = "test";

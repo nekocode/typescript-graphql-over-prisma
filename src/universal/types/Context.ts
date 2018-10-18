@@ -1,9 +1,8 @@
-import { GraphQLSchema } from 'graphql';
-import { HttpLink } from 'apollo-link-http';
-import { IncomingMessage, ServerResponse } from 'http';
+import { HttpLink } from "apollo-link-http";
+import { IncomingMessage, ServerResponse } from "http";
 
-export interface Context {
-  req: IncomingMessage,
-  res: ServerResponse,
-  prismaLink: HttpLink,
+export interface IContext {
+  req: IncomingMessage;
+  res: ServerResponse;
+  prismaLink: HttpLink;
 }

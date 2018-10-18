@@ -1,27 +1,27 @@
+import { HttpLink } from "apollo-link-http";
 import {
   ApolloServer,
   makeExecutableSchema,
-} from 'apollo-server';
-import { HttpLink } from 'apollo-link-http';
-import { importSchema } from "graphql-import";
+} from "apollo-server";
 // https://github.com/apollographql/apollo-link/issues/513
-import { fetch } from 'cross-fetch';
-import { resolvers } from './resolvers';
-import { Context } from './universal';
+import { fetch } from "cross-fetch";
+import { importSchema } from "graphql-import";
+import { resolvers } from "./resolvers";
+import { IContext } from "./universal";
 
 const prismaLink = new HttpLink({
-  fetch: fetch,
-  uri: 'http://localhost:4466',
+  fetch,
+  uri: "http://localhost:4466",
 });
 
 const server = new ApolloServer({
-  schema: makeExecutableSchema({
-    typeDefs: importSchema('src/schema.graphql'),
-    resolvers,
-  }),
-  context: async ({ req, res }): Promise<Context> => {
-    return { req, res, prismaLink }
+  context: async ({ req, res }): Promise<IContext> => {
+    return { req, res, prismaLink };
   },
+  schema: makeExecutableSchema({
+    resolvers,
+    typeDefs: importSchema("src/schema.graphql"),
+  }),
 });
 
 server.listen().then(({ url }) => {
